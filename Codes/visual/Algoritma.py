@@ -202,7 +202,31 @@ def editDistanceGreedy(string1, string2):
     return edit_distance_DynamicForGreedy(string1, string2)
 
 
+# Greedy - Backtracking Approach
+def editDistanceBacktracking(a, b, i=0, j=0, memo={}):
+    # Use memoization to save previously computed values
+    if (i, j) in memo:
+        return memo[(i, j)]
 
+    # Base cases
+    if i == len(a):  # a is exhausted, so we need insertions for the remainder of b
+        return len(b) - j
+    if j == len(b):  # b is exhausted, so we need deletions for the remainder of a
+        return len(a) - i
+
+    # If characters match, move to the next characters
+    if a[i] == b[j]:
+        memo[(i, j)] = editDistanceBacktracking(a, b, i + 1, j + 1)
+        return memo[(i, j)]
+    
+    # Try the three possible operations and choose the minimum one
+    insert_op = 1 + editDistanceBacktracking(a, b, i, j + 1)   # Insert a character
+    delete_op = 1 + editDistanceBacktracking(a, b, i + 1, j)   # Delete a character
+    replace_op = 1 + editDistanceBacktracking(a, b, i + 1, j + 1)  # Replace a character
+    
+    # Take the minimum of the three operations
+    memo[(i, j)] = min(insert_op, delete_op, replace_op)
+    return memo[(i, j)]
 
 
 
