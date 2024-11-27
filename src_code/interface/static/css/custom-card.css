@@ -1,0 +1,5 @@
+.custom-card {
+  width: 300px; /* Atur lebar card */
+  height: 120px; /* Atur tinggi card */
+  margin: 10px; /* Tambahkan jarak antar card */
+}
