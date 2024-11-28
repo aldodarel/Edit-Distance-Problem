@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>AlgoCompare</title>
+    <title>Edit Distance Problem</title>
 
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/fzavicon.ico') }}" />
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
@@ -16,7 +16,7 @@
     <section class="cover-5 text-center">
       <nav class="navbar navbar-expand-lg navbar-light navbar-custom">
         <div class="container">
-          <a class="navbar-brand" href="/">AlgoCompareED</a>
+          <a class="navbar-brand" href="/">Kelompok 09</a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -51,7 +51,7 @@
                 <a class="nav-link" href="/stripek">Stripe</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/recursive">Recursive</a>
+                <a class="nav-link" href="/recursive">Bruteforce</a>
               </li>
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">B & B</a>
@@ -61,7 +61,10 @@
                 </div>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/proteindb">Backtracking Approach</a>
+                <a class="nav-link" href="/proteindb">Backtracking</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/proteindb">BFS</a>
               </li>
             </ul>
           </div>
@@ -150,12 +153,41 @@
             </div>
           </div>
 
+          <div class="row">
+            <div class="col-md-4">
+              <div class="card custom-card text-white bg-success mb-4" onclick="window.location='/branchandboundwithqueue';" style="cursor: pointer">
+                <div class="card-body">
+                  <h5 class="card-title">Branch and Bound - Queue Approach</h5>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card custom-card text-white bg-info mb-4" onclick="window.location='/recursive';" style="cursor: pointer">
+                <div class="card-body">
+                  <h5 class="card-title">Breadth First Search</h5>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card custom-card text-white bg-warning mb-4" onclick="window.location='/branchandboundwithpath';" style="cursor: pointer">
+                <div class="card-body">
+                  <h5 class="card-title">Backtracking Approach</h5>
+                </div>
+              </div>
+            </div>
+          </div>
           <!-- Row 4 -->
-          <div class="row d-flex justify-content-center">
-            <div class="col-md-6 d-flex justify-content-center">
+          <!-- <div class="row d-flex justify-content-center">
+            <div class="col-md-4 d-flex justify-content-center">
               <div class="card custom-card text-white bg-danger mb-4" onclick="window.location='/branchandboundwithqueue';" style="cursor: pointer; max-width: 20rem; width: 100%">
                 <div class="card-body">
                   <h5 class="card-title text-center">Branch and Bound - Queue Approach</h5>
+                </div>
+              </div>
+              <div class="col-md-4 d-flex justify-content-center">
+              <div class="card custom-card text-white bg-danger mb-4" onclick="window.location='/branchandboundwithqueue';" style="cursor: pointer; max-width: 20rem; width: 100%">
+                <div class="card-body">
+                  <h5 class="card-title text-center">Breadth First Search</h5>
                 </div>
               </div>
             </div>
@@ -166,7 +198,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
     </section>
@@ -175,7 +207,7 @@
       <div class="container">
         <div class="row">
           <div class="col-md-6 text-center text-md-left mt-2 mb-3 pt-1">
-            <p class="copyright">Copyright &copy; 2024 AlgoCompareED. All rights reserved.</p>
+            <p class="copyright">Copyright &copy; 2024 Kelompok 09. All rights reserved.</p>
           </div>
         </div>
       </div>
