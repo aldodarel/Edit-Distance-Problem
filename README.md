@@ -2,11 +2,11 @@
 Proyek ini berfokus pada penerapan dan evaluasi beberapa algoritma untuk menghitung jarak Edit (ED) atau Edit Distance, yang merupakan adaptasi dari masalah Longest Common Subsequence (LCS). Dalam proyek ini, beberapa algoritma untuk menghitung Edit Distance akan dibandingkan baik dari segi waktu eksekusi maupun kualitas solusi yang dihasilkan. Proyek ini bertujuan untuk memahami karakteristik setiap algoritma dalam menangani perubahan minimal antar string, termasuk penyisipan, penghapusan, dan substitusi karakter.
 
 ## Algorithm
-- Brute Force 🔥
+- Recursive 🔥
 - Divide and Conquer 🚀
-- Decrease and Conquer 🍔
+- Stripe 🍔
 - Greedy 🫥
-- Breadth first search 🦮
+- Breadth First Search 🦮
 - Backtracking ❤️❤️
 - Branch and Bound 👟
 - Dynamic Programming 🎶🎶
