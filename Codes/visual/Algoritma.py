@@ -161,45 +161,62 @@ def LevenshteinDistance(string1, string2):
 
 
 def ed_greedy(a, b):
-    value = 0
-    if len(a) > len(b):
-        bigger = a;
-        smaller = b
-    else:
-        bigger = b;
-        smaller = a
-    BIGGER = []
-    SMALLER = []
-    for i in range(len(bigger) - len(smaller)):
-        SMALLER.append(0)
+    # Determine which is larger
+    bigger, smaller = (a, b) if len(a) > len(b) else (b, a)
 
-    i = 0
-    while i < len(bigger):
-        BIGGER.append(bigger[i]);
-        i += 1
-    i = 0
-    while i < len(smaller):
-        SMALLER.append(smaller[i]);
-        i += 1
+    # Pad smaller string with zeros
+    smaller = [0] * (len(bigger) - len(smaller)) + list(smaller)
+    bigger = list(bigger)
 
-    for i in range(len(BIGGER)):
-        if (BIGGER[-1 - i]) != (SMALLER[-1 - i]):
-            value += 1
+    # Count mismatches
+    value = sum(1 for big, small in zip(reversed(bigger), reversed(smaller)) if big != small)
 
     return value
 
 
 
 #greedy method accepting only charactor values
-def editDistanceGreedy(string1, string2):
-    rnd = 0
-    while len(longestSubstringFinder(string1,string2))>1:
-        lcs = longestSubstringFinder(string1, string2)
-        string1 = string1.replace(lcs, str(rnd))
-        string2 = string2.replace(lcs, str(rnd))
-        rnd += 1
+# def editDistanceGreedy(string1, string2):
+#     rnd = 0
+#     while len(longestSubstringFinder(string1,string2))>1:
+#         lcs = longestSubstringFinder(string1, string2)
+#         string1 = string1.replace(lcs, str(rnd))
+#         string2 = string2.replace(lcs, str(rnd))
+#         rnd += 1
 
+#     return edit_distance_DynamicForGreedy(string1, string2)
+
+def editDistanceGreedy(string1, string2):
+    def longestSubstringFinder(S1, S2):
+        # Find the longest common substring between two strings
+        m, n = len(S1), len(S2)
+        LCSuff = [[0] * (n + 1) for _ in range(m + 1)]
+        length = 0
+        end_index = 0
+
+        for i in range(1, m + 1):
+            for j in range(1, n + 1):
+                if S1[i - 1] == S2[j - 1]:
+                    LCSuff[i][j] = LCSuff[i - 1][j - 1] + 1
+                    if LCSuff[i][j] > length:
+                        length = LCSuff[i][j]
+                        end_index = i
+                else:
+                    LCSuff[i][j] = 0
+
+        return S1[end_index - length:end_index]
+
+    # Main Greedy LCS Logic
+    placeholder = chr(256)  # Use a non-printable ASCII character as a placeholder
+    while len(longestSubstringFinder(string1, string2)) > 1:
+        lcs = longestSubstringFinder(string1, string2)
+        string1 = string1.replace(lcs, placeholder)
+        string2 = string2.replace(lcs, placeholder)
+        placeholder = chr(ord(placeholder) + 1)  # Increment placeholder for uniqueness
+
+    # Calculate edit distance using Dynamic Programming
     return edit_distance_DynamicForGreedy(string1, string2)
+
 
 
 # Greedy - Backtracking Approach
@@ -230,18 +247,18 @@ def editDistanceBacktracking(a, b, i=0, j=0, memo={}):
 
 
 
-def longestSubstringFinder(string1, string2):
-    answer = ""
-    len1, len2 = len(string1), len(string2)
-    for i in range(len1):
-        match = ""
-        for j in range(len2):
-            if (i + j < len1 and string1[i + j] == string2[j]):
-                match += string2[j]
-            else:
-                if (len(match) > len(answer)): answer = match
-                match = ""
-    return answer
+# def longestSubstringFinder(string1, string2):
+#     answer = ""
+#     len1, len2 = len(string1), len(string2)
+#     for i in range(len1):
+#         match = ""
+#         for j in range(len2):
+#             if (i + j < len1 and string1[i + j] == string2[j]):
+#                 match += string2[j]
+#             else:
+#                 if (len(match) > len(answer)): answer = match
+#                 match = ""
+#     return answer
 
 def edit_distance_DynamicForGreedy(str_A, str_B):
     A = np.fromstring(str_A, dtype='|S1')
@@ -497,55 +514,43 @@ def cutoff(a, b, bound,
 
 
 def ed_bb(a, b, cumulcost=0, path=[], bound=None):
-    # The function return a tuple (value of distance, path to follow (left,mid,right, at each step) to reach a solution)
-    # We browse the tree in depth first search
-    # In each step we can choose 3 branches :
-    # The two ones that respectively indicates to look at (a[:-1],b) and (a,b[:-1]) and cost one
-    # The last one that indicate to look for (a[:-1],b[:-1]), cost zero or one
-
-
+    # Initialize bound with infinity if not provided
     if bound is None:
-        bound = []
-        bound.append(
-            987654321)  # As the bound can't be used as a local int variable in this algorithm, I used this trick (to avoid to define a global variable)
+        bound = [float('inf')]
 
+    # Base cases
     if a == "":
-        if cumulcost + len(b) < bound[0]:
-            bound[0] = cumulcost + len(
-                b)  # When reaching a solution, we check if the cost is lesser than current bound, and if so we update the bound
+        total_cost = cumulcost + len(b)
+        if total_cost < bound[0]:
+            bound[0] = total_cost
         return (len(b), path + ['m'] * len(b))
 
     if b == "":
-        if cumulcost + len(a) < bound[0]:
-            bound[0] = cumulcost + len(a)
+        total_cost = cumulcost + len(a)
+        if total_cost < bound[0]:
+            bound[0] = total_cost
         return (len(a), path + ['g'] * len(a))
 
-    if a[-1] == b[-1]:
-        cost = 0
-    else:
-        cost = 1
+    # Determine cost of substitution/match
+    cost = 0 if a[-1] == b[-1] else 1
 
-    if cutoff(a, b, bound[0], cumulcost) == False:
-        gauche = ed_bb(a[:-1], b, cumulcost + 1, path + ['g'],
-                       bound)  # The steps here are classical as in the recursive way
-        gauche = (gauche[0] + 1, gauche[1])
+    # Cutoff condition to prune branches
+    if cumulcost + min(len(a), len(b)) >= bound[0]:
+        return (float('inf'), path)
 
-        milieu = ed_bb(a, b[:-1], cumulcost + 1, path + ['m'], bound)
-        milieu = (milieu[0] + 1, milieu[1])
+    # Recursive exploration of branches
+    gauche = ed_bb(a[:-1], b, cumulcost + 1, path + ['g'], bound)
+    milieu = ed_bb(a, b[:-1], cumulcost + 1, path + ['m'], bound)
+    droite = ed_bb(a[:-1], b[:-1], cumulcost + cost, path + ['d'], bound)
 
-        droite = ed_bb(a[:-1], b[:-1], cumulcost + cost, path + ['d'], bound)
-        droite = (droite[0] + cost, droite[1])
-
-        res = min([gauche, milieu, droite], key=lambda x: x[0])
-
-        return res
-
-    else:
-        return (123456789, path)  # This permits to return an (int,path) in every case, otherwise, the function cannot works. Moreother if we reach this step it means that cutoff occured, so first we don't make recursive call, and second we return a very big number that cannot be the min of the compared paths
+    # Take the minimum cost branch
+    res = min([gauche, milieu, droite], key=lambda x: x[0])
+    return res
+  # This permits to return an (int,path) in every case, otherwise, the function cannot works. Moreother if we reach this step it means that cutoff occured, so first we don't make recursive call, and second we return a very big number that cannot be the min of the compared paths
 
 
-def ed_bb_with_path_and_alignment(a,b):
-    return (ed_bb(a,b), alignment_bb(a,b))
+def ed_bb_with_path_and_alignment(a, b):
+    return ed_bb(a, b), alignment_bb(a, b)
 
 
 #special
@@ -623,34 +628,24 @@ def rec_ed_with_path_and_alignment(a, b):
 
 
 def alignment_bb(a, b):
-    A = []
-    B = []
-    AA = []  # Simply will containt characters of string a
-    BB = []  # Simply will containt characters of string b
-    i = 0
-    while i < len(a):
-        AA.append(a[i]);
-        i += 1
-    i = 0
-    while i < len(b):
-        BB.append(b[i]);
-        i += 1
+    A, B = [], []
+    AA, BB = list(a), list(b)  # Convert strings to lists for mutable operations
 
-    path = ed_bb(a, b)[1]
-    path.reverse()  # We reverse path because it is more conveniant for indexation
+    # Retrieve the path from the Branch and Bound algorithm
+    path = ed_bb(a, b)[1][::-1]  # Reverse the path for correct indexing
 
-    for i in range(len(path)):
-
-        if path[i] == 'g':
+    # Construct aligned strings
+    for step in path:
+        if step == 'g':
             B.append('*')
         else:
-            B.append(BB[0]);
-            del BB[0]
-        if path[i] == 'm':
+            B.append(BB.pop(0) if BB else '*')
+
+        if step == 'm':
             A.append('*')
         else:
-            A.append(AA[0]);
-            del AA[0]
+            A.append(AA.pop(0) if AA else '*')
+
     return (A, B)
 
 
