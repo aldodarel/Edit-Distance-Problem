@@ -72,9 +72,9 @@
     <div class="cover-container pb-5 ">
         <div class="container">
             <div class="divider"></div>
-            <h3>Edit Distance - Recursive</h3>
+            <h3>Edit Distance - Breadth First Search</h3>
             <div class="divider"></div>
-            <p class="lead ">Recursive Approach</p>
+            <p class="lead ">BFS Approach</p>
         </div>
         <div class="container">
 
@@ -108,7 +108,7 @@
                         <td>
 
                             <div class="col-sm-4" style=" width: 100%;margin: 0 auto;">
-                                <button  id="calcrecursiveReset" class="btn btn-lg btn-outline-danger" >Reset</button>
+                                <button  id="calcbfsReset" class="btn btn-lg btn-outline-danger" >Reset</button>
                             </div>
 
                         </td>
@@ -134,7 +134,7 @@
                         </td>
                         <td>
                             <div class="col-sm-4" style=" width: 50%;margin: 0 auto;">
-                                <button type="submit" id="calcrecursive" class="btn btn-lg btn-outline-success">Calculate Edit Distance</button>
+                                <button type="submit" id="calcbfs" class="btn btn-lg btn-outline-success">Calculate Edit Distance</button>
                             </div>
                         </td>
                     </tr>
@@ -215,14 +215,38 @@
 
 
             <div style="text-align:left!important">
-<pre style='color:#d1d1d1;background:#000000;'><span style='color:#e66170; font-weight:bold; '>def</span> ed<span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>,</span> b<span style='color:#d2cd86; '>,</span>path<span style='color:#d2cd86; '>=</span><span style='color:#d2cd86; '>[</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>)</span><span style='color:#d2cd86; '>:</span>
+<pre style='color:#d1d1d1;background:#000000;'><span style='color:#e66170; font-weight:bold; '>def</span> h<span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>,</span>b<span style='color:#d2cd86; '>)</span><span style='color:#d2cd86; '>:</span>
+    <span style='color:#e66170; font-weight:bold; '>return</span> <span style='color:#e66170; font-weight:bold; '>abs</span><span style='color:#d2cd86; '>(</span><span style='color:#e66170; font-weight:bold; '>len</span><span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>)</span><span style='color:#00dddd; '>-</span><span style='color:#e66170; font-weight:bold; '>len</span><span style='color:#d2cd86; '>(</span>b<span style='color:#d2cd86; '>)</span><span style='color:#d2cd86; '>)</span>   <span style='color:#9999a9; '>#This corresponds to h in f=g*+h seen in the courses, that return the "at least needed operations to reach goal" for a given node</span>
 
-<span style='color:#9999a9; '>#The function return a tuple (value of distance, path to follow (left,mid,right, at each step) to reach a solution)  </span>
+
+<span style='color:#e66170; font-weight:bold; '>def</span> cutoff<span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>,</span>b<span style='color:#d2cd86; '>,</span>bound<span style='color:#d2cd86; '>,</span> cumulcost<span style='color:#d2cd86; '>)</span><span style='color:#d2cd86; '>:</span> <span style='color:#9999a9; '>#This is the function that indicates if we have or not to prune a node and his subtree</span>
+    <span style='color:#e66170; font-weight:bold; '>if</span> cumulcost<span style='color:#00dddd; '>+</span>h<span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>,</span>b<span style='color:#d2cd86; '>)</span><span style='color:#00dddd; '>>=</span> bound <span style='color:#d2cd86; '>:</span>
+        <span style='color:#e66170; font-weight:bold; '>return</span> True
+    <span style='color:#e66170; font-weight:bold; '>else</span><span style='color:#d2cd86; '>:</span>
+        <span style='color:#e66170; font-weight:bold; '>return</span> False
+
+
+<span style='color:#e66170; font-weight:bold; '>def</span> ed_bb<span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>,</span> b<span style='color:#d2cd86; '>,</span> cumulcost<span style='color:#d2cd86; '>=</span><span style='color:#00a800; '>0</span><span style='color:#d2cd86; '>,</span> path<span style='color:#d2cd86; '>=</span><span style='color:#d2cd86; '>[</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>,</span> bound<span style='color:#d2cd86; '>=</span>None<span style='color:#d2cd86; '>)</span><span style='color:#d2cd86; '>:</span>
+
+<span style='color:#9999a9; '>#The function return a tuple (value of distance, path to follow (left,mid,right, at each step) to reach a solution)</span>
+<span style='color:#9999a9; '>#We browse the tree in depth first search </span>
+<span style='color:#9999a9; '>#In each step we can choose 3 branches :</span>
+<span style='color:#9999a9; '>#The two ones that respectively indicates to look at (a[:-1],b) and (a,b[:-1]) and cost one</span>
+<span style='color:#9999a9; '>#The last one that indicate to look for (a[:-1],b[:-1]), cost zero or one</span>
+
+
+    <span style='color:#e66170; font-weight:bold; '>if</span> bound <span style='color:#e66170; font-weight:bold; '>is</span> None<span style='color:#d2cd86; '>:</span>
+        bound <span style='color:#d2cd86; '>=</span> <span style='color:#d2cd86; '>[</span><span style='color:#d2cd86; '>]</span>
+        bound<span style='color:#d2cd86; '>.</span>append<span style='color:#d2cd86; '>(</span><span style='color:#00a800; '>987654321</span><span style='color:#d2cd86; '>)</span> <span style='color:#9999a9; '>#As the bound can't be used as a local int variable in this algorithm, I used this trick (to avoid to define a global variable)</span>
 
     <span style='color:#e66170; font-weight:bold; '>if</span> a <span style='color:#00dddd; '>==</span> <span style='color:#00c4c4; '>""</span><span style='color:#d2cd86; '>:</span>
+        <span style='color:#e66170; font-weight:bold; '>if</span> cumulcost<span style='color:#00dddd; '>+</span><span style='color:#e66170; font-weight:bold; '>len</span><span style='color:#d2cd86; '>(</span>b<span style='color:#d2cd86; '>)</span><span style='color:#00dddd; '>&lt;</span>bound<span style='color:#d2cd86; '>[</span><span style='color:#00a800; '>0</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>:</span>
+            bound<span style='color:#d2cd86; '>[</span><span style='color:#00a800; '>0</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>=</span>cumulcost<span style='color:#00dddd; '>+</span><span style='color:#e66170; font-weight:bold; '>len</span><span style='color:#d2cd86; '>(</span>b<span style='color:#d2cd86; '>)</span> <span style='color:#9999a9; '># When reaching a solution, we check if the cost is lesser than current bound, and if so we update the bound</span>
         <span style='color:#e66170; font-weight:bold; '>return</span> <span style='color:#d2cd86; '>(</span><span style='color:#e66170; font-weight:bold; '>len</span><span style='color:#d2cd86; '>(</span>b<span style='color:#d2cd86; '>)</span><span style='color:#d2cd86; '>,</span> path <span style='color:#00dddd; '>+</span> <span style='color:#d2cd86; '>[</span><span style='color:#00c4c4; '>'m'</span><span style='color:#d2cd86; '>]</span><span style='color:#00dddd; '>*</span><span style='color:#e66170; font-weight:bold; '>len</span><span style='color:#d2cd86; '>(</span>b<span style='color:#d2cd86; '>)</span><span style='color:#d2cd86; '>)</span>
 
     <span style='color:#e66170; font-weight:bold; '>if</span> b <span style='color:#00dddd; '>==</span> <span style='color:#00c4c4; '>""</span><span style='color:#d2cd86; '>:</span>
+        <span style='color:#e66170; font-weight:bold; '>if</span> cumulcost<span style='color:#00dddd; '>+</span><span style='color:#e66170; font-weight:bold; '>len</span><span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>)</span><span style='color:#00dddd; '>&lt;</span>bound<span style='color:#d2cd86; '>[</span><span style='color:#00a800; '>0</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>:</span>
+           bound<span style='color:#d2cd86; '>[</span><span style='color:#00a800; '>0</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>=</span>cumulcost<span style='color:#00dddd; '>+</span><span style='color:#e66170; font-weight:bold; '>len</span><span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>)</span>
         <span style='color:#e66170; font-weight:bold; '>return</span> <span style='color:#d2cd86; '>(</span><span style='color:#e66170; font-weight:bold; '>len</span><span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>)</span><span style='color:#d2cd86; '>,</span> path <span style='color:#00dddd; '>+</span> <span style='color:#d2cd86; '>[</span><span style='color:#00c4c4; '>'g'</span><span style='color:#d2cd86; '>]</span><span style='color:#00dddd; '>*</span><span style='color:#e66170; font-weight:bold; '>len</span><span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>)</span><span style='color:#d2cd86; '>)</span>
 
     <span style='color:#e66170; font-weight:bold; '>if</span> a<span style='color:#d2cd86; '>[</span><span style='color:#00dddd; '>-</span><span style='color:#00a800; '>1</span><span style='color:#d2cd86; '>]</span> <span style='color:#00dddd; '>==</span> b<span style='color:#d2cd86; '>[</span><span style='color:#00dddd; '>-</span><span style='color:#00a800; '>1</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>:</span>
@@ -230,22 +254,22 @@
     <span style='color:#e66170; font-weight:bold; '>else</span><span style='color:#d2cd86; '>:</span>
         cost <span style='color:#d2cd86; '>=</span> <span style='color:#00a800; '>1</span>
 
+    <span style='color:#e66170; font-weight:bold; '>if</span> cutoff<span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>,</span>b<span style='color:#d2cd86; '>,</span> bound<span style='color:#d2cd86; '>[</span><span style='color:#00a800; '>0</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>,</span> cumulcost<span style='color:#d2cd86; '>)</span><span style='color:#00dddd; '>==</span>False<span style='color:#d2cd86; '>:</span>
+        gauche <span style='color:#d2cd86; '>=</span> ed_bb<span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>[</span><span style='color:#d2cd86; '>:</span><span style='color:#00dddd; '>-</span><span style='color:#00a800; '>1</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>,</span> b<span style='color:#d2cd86; '>,</span> cumulcost<span style='color:#00dddd; '>+</span><span style='color:#00a800; '>1</span><span style='color:#d2cd86; '>,</span> path <span style='color:#00dddd; '>+</span> <span style='color:#d2cd86; '>[</span><span style='color:#00c4c4; '>'g'</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>,</span> bound<span style='color:#d2cd86; '>)</span> <span style='color:#9999a9; '>#The steps here are classical as in the recursive way</span>
+        gauche <span style='color:#d2cd86; '>=</span> <span style='color:#d2cd86; '>(</span>gauche<span style='color:#d2cd86; '>[</span><span style='color:#00a800; '>0</span><span style='color:#d2cd86; '>]</span> <span style='color:#00dddd; '>+</span> <span style='color:#00a800; '>1</span><span style='color:#d2cd86; '>,</span> gauche<span style='color:#d2cd86; '>[</span><span style='color:#00a800; '>1</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>)</span>
 
-    gauche <span style='color:#d2cd86; '>=</span> ed<span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>[</span><span style='color:#d2cd86; '>:</span><span style='color:#00dddd; '>-</span><span style='color:#00a800; '>1</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>,</span> b<span style='color:#d2cd86; '>,</span> path <span style='color:#00dddd; '>+</span> <span style='color:#d2cd86; '>[</span><span style='color:#00c4c4; '>'g'</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>)</span>
-    gauche <span style='color:#d2cd86; '>=</span> <span style='color:#d2cd86; '>(</span>gauche<span style='color:#d2cd86; '>[</span><span style='color:#00a800; '>0</span><span style='color:#d2cd86; '>]</span> <span style='color:#00dddd; '>+</span> <span style='color:#00a800; '>1</span><span style='color:#d2cd86; '>,</span> gauche<span style='color:#d2cd86; '>[</span><span style='color:#00a800; '>1</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>)</span>
+        milieu <span style='color:#d2cd86; '>=</span> ed_bb<span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>,</span> b<span style='color:#d2cd86; '>[</span><span style='color:#d2cd86; '>:</span><span style='color:#00dddd; '>-</span><span style='color:#00a800; '>1</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>,</span> cumulcost<span style='color:#00dddd; '>+</span><span style='color:#00a800; '>1</span><span style='color:#d2cd86; '>,</span> path <span style='color:#00dddd; '>+</span> <span style='color:#d2cd86; '>[</span><span style='color:#00c4c4; '>'m'</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>,</span> bound<span style='color:#d2cd86; '>)</span>
+        milieu <span style='color:#d2cd86; '>=</span> <span style='color:#d2cd86; '>(</span>milieu<span style='color:#d2cd86; '>[</span><span style='color:#00a800; '>0</span><span style='color:#d2cd86; '>]</span> <span style='color:#00dddd; '>+</span> <span style='color:#00a800; '>1</span><span style='color:#d2cd86; '>,</span> milieu<span style='color:#d2cd86; '>[</span><span style='color:#00a800; '>1</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>)</span>
 
-    milieu <span style='color:#d2cd86; '>=</span> ed<span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>,</span> b<span style='color:#d2cd86; '>[</span><span style='color:#d2cd86; '>:</span><span style='color:#00dddd; '>-</span><span style='color:#00a800; '>1</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>,</span>path <span style='color:#00dddd; '>+</span> <span style='color:#d2cd86; '>[</span><span style='color:#00c4c4; '>'m'</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>)</span>
-    milieu <span style='color:#d2cd86; '>=</span> <span style='color:#d2cd86; '>(</span>milieu<span style='color:#d2cd86; '>[</span><span style='color:#00a800; '>0</span><span style='color:#d2cd86; '>]</span> <span style='color:#00dddd; '>+</span> <span style='color:#00a800; '>1</span><span style='color:#d2cd86; '>,</span> milieu<span style='color:#d2cd86; '>[</span><span style='color:#00a800; '>1</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>)</span>
+        droite <span style='color:#d2cd86; '>=</span> ed_bb<span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>[</span><span style='color:#d2cd86; '>:</span><span style='color:#00dddd; '>-</span><span style='color:#00a800; '>1</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>,</span> b<span style='color:#d2cd86; '>[</span><span style='color:#d2cd86; '>:</span><span style='color:#00dddd; '>-</span><span style='color:#00a800; '>1</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>,</span>cumulcost<span style='color:#00dddd; '>+</span>cost<span style='color:#d2cd86; '>,</span> path <span style='color:#00dddd; '>+</span> <span style='color:#d2cd86; '>[</span><span style='color:#00c4c4; '>'d'</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>,</span> bound<span style='color:#d2cd86; '>)</span>
+        droite <span style='color:#d2cd86; '>=</span> <span style='color:#d2cd86; '>(</span>droite<span style='color:#d2cd86; '>[</span><span style='color:#00a800; '>0</span><span style='color:#d2cd86; '>]</span> <span style='color:#00dddd; '>+</span> cost<span style='color:#d2cd86; '>,</span> droite<span style='color:#d2cd86; '>[</span><span style='color:#00a800; '>1</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>)</span>
 
-    droite <span style='color:#d2cd86; '>=</span> ed<span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>[</span><span style='color:#d2cd86; '>:</span><span style='color:#00dddd; '>-</span><span style='color:#00a800; '>1</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>,</span> b<span style='color:#d2cd86; '>[</span><span style='color:#d2cd86; '>:</span><span style='color:#00dddd; '>-</span><span style='color:#00a800; '>1</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>,</span> path <span style='color:#00dddd; '>+</span> <span style='color:#d2cd86; '>[</span><span style='color:#00c4c4; '>'d'</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>)</span>
-    droite <span style='color:#d2cd86; '>=</span> <span style='color:#d2cd86; '>(</span>droite<span style='color:#d2cd86; '>[</span><span style='color:#00a800; '>0</span><span style='color:#d2cd86; '>]</span> <span style='color:#00dddd; '>+</span> cost<span style='color:#d2cd86; '>,</span> droite<span style='color:#d2cd86; '>[</span><span style='color:#00a800; '>1</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>)</span>
+        res <span style='color:#d2cd86; '>=</span> <span style='color:#e66170; font-weight:bold; '>min</span><span style='color:#d2cd86; '>(</span><span style='color:#d2cd86; '>[</span>gauche<span style='color:#d2cd86; '>,</span> milieu<span style='color:#d2cd86; '>,</span> droite<span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>,</span> key<span style='color:#d2cd86; '>=</span><span style='color:#e66170; font-weight:bold; '>lambda</span> x<span style='color:#d2cd86; '>:</span> x<span style='color:#d2cd86; '>[</span><span style='color:#00a800; '>0</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>)</span>
 
-    res <span style='color:#d2cd86; '>=</span> <span style='color:#e66170; font-weight:bold; '>min</span><span style='color:#d2cd86; '>(</span><span style='color:#d2cd86; '>[</span>gauche<span style='color:#d2cd86; '>,</span> milieu<span style='color:#d2cd86; '>,</span> droite<span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>,</span> key<span style='color:#d2cd86; '>=</span><span style='color:#e66170; font-weight:bold; '>lambda</span> x<span style='color:#d2cd86; '>:</span> x<span style='color:#d2cd86; '>[</span><span style='color:#00a800; '>0</span><span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>)</span>
+        <span style='color:#e66170; font-weight:bold; '>return</span> res
 
-    <span style='color:#e66170; font-weight:bold; '>return</span> res
-
-
-
+    <span style='color:#e66170; font-weight:bold; '>else</span><span style='color:#d2cd86; '>:</span>
+        <span style='color:#e66170; font-weight:bold; '>return</span> <span style='color:#d2cd86; '>(</span><span style='color:#00a800; '>123456789</span><span style='color:#d2cd86; '>,</span> path<span style='color:#d2cd86; '>)</span> <span style='color:#9999a9; '>#This permits to return an (int,path) in every case, otherwise, the function cannot works. Moreother if we reach this step it means that cutoff occured, so first we don't make recursive call, and second we return a very big number that cannot be the min of the compared paths</span>
 
 
 <span style='color:#e66170; font-weight:bold; '>def</span> alignment<span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>,</span>b<span style='color:#d2cd86; '>)</span><span style='color:#d2cd86; '>:</span>
@@ -262,7 +286,7 @@
         BB<span style='color:#d2cd86; '>.</span>append<span style='color:#d2cd86; '>(</span>b<span style='color:#d2cd86; '>[</span>i<span style='color:#d2cd86; '>]</span><span style='color:#d2cd86; '>)</span> <span style='color:#d2cd86; '>;</span> i<span style='color:#00dddd; '>+</span><span style='color:#d2cd86; '>=</span><span style='color:#00a800; '>1</span>
 
 
-    path<span style='color:#d2cd86; '>=</span>ed<span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>,</span>b<span style='color:#d2cd86; '>)</span><span style='color:#d2cd86; '>[</span><span style='color:#00a800; '>1</span><span style='color:#d2cd86; '>]</span>
+    path<span style='color:#d2cd86; '>=</span>ed_bb<span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>,</span>b<span style='color:#d2cd86; '>)</span><span style='color:#d2cd86; '>[</span><span style='color:#00a800; '>1</span><span style='color:#d2cd86; '>]</span>
     path<span style='color:#d2cd86; '>.</span>reverse<span style='color:#d2cd86; '>(</span><span style='color:#d2cd86; '>)</span> <span style='color:#9999a9; '>#We reverse path because it is more conveniant for indexation</span>
 
     <span style='color:#e66170; font-weight:bold; '>for</span> i <span style='color:#e66170; font-weight:bold; '>in</span> <span style='color:#e66170; font-weight:bold; '>range</span><span style='color:#d2cd86; '>(</span><span style='color:#e66170; font-weight:bold; '>len</span><span style='color:#d2cd86; '>(</span>path<span style='color:#d2cd86; '>)</span><span style='color:#d2cd86; '>)</span><span style='color:#d2cd86; '>:</span>
@@ -278,13 +302,15 @@
     <span style='color:#e66170; font-weight:bold; '>return</span> <span style='color:#d2cd86; '>(</span>A<span style='color:#d2cd86; '>,</span>B<span style='color:#d2cd86; '>)</span>
 
 
+alignment<span style='color:#d2cd86; '>(</span><span style='color:#00c4c4; '>"hhABhzCD"</span><span style='color:#d2cd86; '>,</span> <span style='color:#00c4c4; '>"ABCDEFg"</span><span style='color:#d2cd86; '>)</span>
 
 
-<span style='color:#e66170; font-weight:bold; '>def</span> ed_with_path_and_alignment<span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>,</span>b<span style='color:#d2cd86; '>)</span><span style='color:#d2cd86; '>:</span>
-    <span style='color:#e66170; font-weight:bold; '>return</span> <span style='color:#d2cd86; '>(</span>ed<span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>,</span>b<span style='color:#d2cd86; '>)</span><span style='color:#d2cd86; '>,</span> alignment<span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>,</span>b<span style='color:#d2cd86; '>)</span><span style='color:#d2cd86; '>)</span>
+
+<span style='color:#e66170; font-weight:bold; '>def</span> ed_bb_with_path_and_alignment<span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>,</span>b<span style='color:#d2cd86; '>)</span><span style='color:#d2cd86; '>:</span>
+    <span style='color:#e66170; font-weight:bold; '>return</span> <span style='color:#d2cd86; '>(</span>ed_bb<span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>,</span>b<span style='color:#d2cd86; '>)</span><span style='color:#d2cd86; '>,</span> alignment<span style='color:#d2cd86; '>(</span>a<span style='color:#d2cd86; '>,</span>b<span style='color:#d2cd86; '>)</span><span style='color:#d2cd86; '>)</span>
 
 
-<span style='color:#e66170; font-weight:bold; '>print</span> ed_with_path_and_alignment<span style='color:#d2cd86; '>(</span><span style='color:#00c4c4; '>"hhABhzCD"</span><span style='color:#d2cd86; '>,</span> <span style='color:#00c4c4; '>"ABCDEFg"</span><span style='color:#d2cd86; '>)</span>
+<span style='color:#e66170; font-weight:bold; '>print</span> ed_bb_with_path_and_alignment<span style='color:#d2cd86; '>(</span><span style='color:#00c4c4; '>"altruistic"</span><span style='color:#d2cd86; '>,</span> <span style='color:#00c4c4; '>"algorithm"</span><span style='color:#d2cd86; '>)</span>
 </pre>
             </div>
 

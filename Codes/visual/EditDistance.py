@@ -293,31 +293,30 @@ def branchandboundwithpath(str_A=None, str_B=None):
     start_time = time()  # Start timing
 
     if str_A:
-        # Compute edit distance and alignment
-        (ed2_value, path), (newA, newB) = Algoritma.ed_bb_with_path_and_alignment(str_A, str_B)
-
-        # Prepare list representations of the strings
+        ed2, (newA, newB) = Algoritma.ed_bb_with_path_and_alignment(str_A, str_B)
+        
+        # Calculate execution time
+        execution_time = time() - start_time
+        
         arr_A = list(str_A)
         arr_B = list(str_B)
-
-        execution_time = time() - start_time  # Calculate execution time
         return render_template(
-            "branchandboundwithpath.html",
-            str_A=str_A,
-            str_B=str_B,
-            edInt=ed2_value,  # Edit Distance Value
-            arr_A=arr_A,
-            arr_B=arr_B,
-            newA="".join(newA),  # Convert aligned A to string
-            newB="".join(newB),  # Convert aligned B to string
-            path=" -> ".join(path),  # Display the path steps
-            execution_time=f"{execution_time:.6f}s"  # Execution time
+            "branchandboundwithpath.html", 
+            str_A=str_A, 
+            str_B=str_B, 
+            edInt=ed2, 
+            arr_A=arr_A, 
+            arr_B=arr_B, 
+            newA=newA, 
+            newB=newB,
+            execution_time=f"{execution_time:.6f}s"  # Format execution time to 6 decimal places
         )
     else:
-        execution_time = time() - start_time  # Calculate execution time for default case
+        # Calculate execution time for default case
+        execution_time = time() - start_time
         return render_template(
-            "branchandboundwithpath.html",
-            str_A=str_A,
+            "branchandboundwithpath.html", 
+            str_A=str_A, 
             str_B=str_B,
             execution_time=f"{execution_time:.6f}s"
         )
@@ -356,6 +355,75 @@ def branchandboundwithqueue(str_A=None, str_B=None):
             execution_time=f"{execution_time:.6f}s"
         )
 
+
+@app.route('/backtracking/')
+@app.route('/backtracking/<str_A>/<str_B>')
+def backtracking_edit_distance(str_A=None, str_B=None):
+    start_time = time()  # Start timing
+
+    if str_A:
+        # Execute Backtracking Edit Distance Algorithm
+        ed_result, (newA, newB) = Algoritma.ed_backtracking_wrapper(str_A, str_B)
+
+        # Prepare data for rendering
+        arr_A = list(str_A)
+        arr_B = list(str_B)
+
+        execution_time = time() - start_time  # Calculate execution time
+        return render_template(
+            "backtracking.html",
+            str_A=str_A, 
+            str_B=str_B, 
+            edInt=ed_result,  # Edit distance
+            arr_A=arr_A, 
+            arr_B=arr_B, 
+            newA=newA,  # Aligned string A
+            newB=newB,  # Aligned string B
+            execution_time=f"{execution_time:.6f}s"
+        )
+    else:
+        execution_time = time() - start_time  # Calculate execution time for default case
+        return render_template(
+            "backtracking.html",
+            str_A=str_A, 
+            str_B=str_B, 
+            execution_time=f"{execution_time:.6f}s"
+        )
+
+
+@app.route('/bfs/')
+@app.route('/bfs/<str_A>/<str_B>')
+def bfs_edit_distance(str_A=None, str_B=None):
+    start_time = time()  # Start timing
+
+    if str_A:
+        # Execute BFS Edit Distance Algorithm
+        ed_result, (newA, newB) = Algoritma.ed_bfs_wrapper(str_A, str_B)
+
+        # Prepare data for rendering
+        arr_A = list(str_A)
+        arr_B = list(str_B)
+
+        execution_time = time() - start_time  # Calculate execution time
+        return render_template(
+            "bfs.html",
+            str_A=str_A, 
+            str_B=str_B, 
+            edInt=ed_result,  # Edit distance
+            arr_A=arr_A, 
+            arr_B=arr_B, 
+            newA=newA,  # Aligned string A
+            newB=newB,  # Aligned string B
+            execution_time=f"{execution_time:.6f}s"
+        )
+    else:
+        execution_time = time() - start_time  # Calculate execution time for default case
+        return render_template(
+            "bfs.html",
+            str_A=str_A, 
+            str_B=str_B, 
+            execution_time=f"{execution_time:.6f}s"
+        )
 
 
 if __name__ == "__main__":

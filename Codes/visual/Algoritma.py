@@ -5,10 +5,11 @@ import queue
 import time
 from random import randint
 import matplotlib.pyplot as plt
+from collections import deque
 
 
-s1 = list();
-p1 = list();
+s1 = list()
+p1 = list()
 
 def edit_distance(A, B):
     n = A.size
@@ -159,19 +160,46 @@ def LevenshteinDistance(string1, string2):
         d.append(row)
     return d[n1][n2], d, n1, n2
 
-
 def ed_greedy(a, b):
-    # Determine which is larger
-    bigger, smaller = (a, b) if len(a) > len(b) else (b, a)
+    value = 0
+    if len(a) > len(b):
+        bigger = a
+        smaller = b
+    else:
+        bigger = b
+        smaller = a
+    BIGGER = []
+    SMALLER = []
+    for i in range(len(bigger) - len(smaller)):
+        SMALLER.append(0)
 
-    # Pad smaller string with zeros
-    smaller = [0] * (len(bigger) - len(smaller)) + list(smaller)
-    bigger = list(bigger)
+    i = 0
+    while i < len(bigger):
+        BIGGER.append(bigger[i])
+        i += 1
+    i = 0
+    while i < len(smaller):
+        SMALLER.append(smaller[i])
+        i += 1
 
-    # Count mismatches
-    value = sum(1 for big, small in zip(reversed(bigger), reversed(smaller)) if big != small)
+    for i in range(len(BIGGER)):
+        if (BIGGER[-1 - i]) != (SMALLER[-1 - i]):
+            value += 1
 
     return value
+
+# def ed_greedy(a, b):
+#     # Determine which is larger
+#     bigger, smaller = (a, b) if len(a) > len(b) else (b, a)
+
+#     # Pad smaller string with zeros
+#     smaller = [0] * (len(bigger) - len(smaller)) + list(smaller)
+#     bigger = list(bigger)
+
+#     # Count mismatches
+#     value = sum(1 for big, small in zip(reversed(bigger), reversed(smaller)) if big != small)
+
+#     return value
 
 
 
@@ -220,32 +248,218 @@ def editDistanceGreedy(string1, string2):
 
 
 # Greedy - Backtracking Approach
-def editDistanceBacktracking(a, b, i=0, j=0, memo={}):
-    # Use memoization to save previously computed values
-    if (i, j) in memo:
-        return memo[(i, j)]
+# def editDistanceBacktracking(a, b, i=0, j=0, memo={}):
+#     # Use memoization to save previously computed values
+#     if (i, j) in memo:
+#         return memo[(i, j)]
 
-    # Base cases
-    if i == len(a):  # a is exhausted, so we need insertions for the remainder of b
-        return len(b) - j
-    if j == len(b):  # b is exhausted, so we need deletions for the remainder of a
-        return len(a) - i
+#     # Base cases
+#     if i == len(a):  # a is exhausted, so we need insertions for the remainder of b
+#         return len(b) - j
+#     if j == len(b):  # b is exhausted, so we need deletions for the remainder of a
+#         return len(a) - i
 
-    # If characters match, move to the next characters
-    if a[i] == b[j]:
-        memo[(i, j)] = editDistanceBacktracking(a, b, i + 1, j + 1)
-        return memo[(i, j)]
+#     # If characters match, move to the next characters
+#     if a[i] == b[j]:
+#         memo[(i, j)] = editDistanceBacktracking(a, b, i + 1, j + 1)
+#         return memo[(i, j)]
     
-    # Try the three possible operations and choose the minimum one
-    insert_op = 1 + editDistanceBacktracking(a, b, i, j + 1)   # Insert a character
-    delete_op = 1 + editDistanceBacktracking(a, b, i + 1, j)   # Delete a character
-    replace_op = 1 + editDistanceBacktracking(a, b, i + 1, j + 1)  # Replace a character
+#     # Try the three possible operations and choose the minimum one
+#     insert_op = 1 + editDistanceBacktracking(a, b, i, j + 1)   # Insert a character
+#     delete_op = 1 + editDistanceBacktracking(a, b, i + 1, j)   # Delete a character
+#     replace_op = 1 + editDistanceBacktracking(a, b, i + 1, j + 1)  # Replace a character
     
-    # Take the minimum of the three operations
-    memo[(i, j)] = min(insert_op, delete_op, replace_op)
-    return memo[(i, j)]
+#     # Take the minimum of the three operations
+#     memo[(i, j)] = min(insert_op, delete_op, replace_op)
+#     return memo[(i, j)]
+
+def ed_backtracking(a, b):
+    """
+    Solve Edit Distance using Backtracking Approach
+    
+    Args:
+    a (str): First input string
+    b (str): Second input string
+    
+    Returns:
+    int: Minimum edit distance between a and b
+    """
+    # Create a 2D matrix to store edit distances
+    m, n = len(a), len(b)
+    dp = [[0] * (n + 1) for _ in range(m + 1)]
+    
+    # Initialize the first row and column
+    for i in range(m + 1):
+        dp[i][0] = i
+    for j in range(n + 1):
+        dp[0][j] = j
+    
+    # Fill the matrix using backtracking approach
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            # If characters are the same, no operation needed
+            if a[i-1] == b[j-1]:
+                dp[i][j] = dp[i-1][j-1]
+            else:
+                # Choose minimum of three operations:
+                # 1. Insert
+                # 2. Delete
+                # 3. Replace
+                dp[i][j] = 1 + min(
+                    dp[i][j-1],    # Insert
+                    dp[i-1][j],    # Delete
+                    dp[i-1][j-1]   # Replace
+                )
+    
+    # Backtrack to find the alignment path
+    align_a, align_b = [], []
+    i, j = m, n
+    while i > 0 and j > 0:
+        if a[i-1] == b[j-1]:
+            align_a.insert(0, a[i-1])
+            align_b.insert(0, b[j-1])
+            i -= 1
+            j -= 1
+        elif dp[i][j] == dp[i-1][j-1] + 1:
+            # Replace
+            align_a.insert(0, a[i-1])
+            align_b.insert(0, b[j-1])
+            i -= 1
+            j -= 1
+        elif dp[i][j] == dp[i-1][j] + 1:
+            # Delete
+            align_a.insert(0, a[i-1])
+            align_b.insert(0, '*')
+            i -= 1
+        else:
+            # Insert
+            align_a.insert(0, '*')
+            align_b.insert(0, b[j-1])
+            j -= 1
+    
+    # Handle remaining characters
+    while i > 0:
+        align_a.insert(0, a[i-1])
+        align_b.insert(0, '*')
+        i -= 1
+    
+    while j > 0:
+        align_a.insert(0, '*')
+        align_b.insert(0, b[j-1])
+        j -= 1
+    
+    return dp[m][n], (align_a, align_b)
+
+def ed_backtracking_wrapper(a, b):
+    """
+    Wrapper function to return edit distance and alignment
+    
+    Args:
+    a (str): First input string
+    b (str): Second input string
+    
+    Returns:
+    tuple: (edit distance, (aligned_a, aligned_b))
+    """
+    return ed_backtracking(a, b)
 
 
+def ed_bfs(a, b):
+    """
+    Solve Edit Distance using Breadth-First Search Approach
+    
+    Args:
+    a (str): First input string
+    b (str): Second input string
+    
+    Returns:
+    tuple: (minimum edit distance, (aligned_a, aligned_b))
+    """
+    # If either string is empty, return length of the other string
+    if not a:
+        return len(b), (['*'] * len(b), list(b))
+    if not b:
+        return len(a), (list(a), ['*'] * len(a))
+    
+    # Queue to store states: (current_a, current_b, current_distance, path_a, path_b)
+    queue = deque([(a, b, 0, [], [])])
+    
+    # Set to keep track of visited states to avoid redundant explorations
+    visited = set()
+    
+    while queue:
+        curr_a, curr_b, dist, path_a, path_b = queue.popleft()
+        
+        # Check if we've reached the end of both strings
+        if not curr_a and not curr_b:
+            return dist, (path_a, path_b)
+        
+        # Create a unique state key
+        state_key = (curr_a, curr_b)
+        if state_key in visited:
+            continue
+        visited.add(state_key)
+        
+        # If one string is exhausted, fill the other with gaps
+        if not curr_a:
+            return dist + len(curr_b), (path_a + ['*'] * len(curr_b), path_b + list(curr_b))
+        if not curr_b:
+            return dist + len(curr_a), (path_a + list(curr_a), path_b + ['*'] * len(curr_a))
+        
+        # Three possible operations: Insert, Delete, Replace/Match
+        # 1. Insert: Add a character from b to a
+        queue.append((
+            curr_a, 
+            curr_b[1:], 
+            dist + 1, 
+            path_a + ['*'], 
+            path_b + [curr_b[0]]
+        ))
+        
+        # 2. Delete: Remove a character from a
+        queue.append((
+            curr_a[1:], 
+            curr_b, 
+            dist + 1, 
+            path_a + [curr_a[0]], 
+            path_b + ['*']
+        ))
+        
+        # 3. Replace/Match: Process first characters
+        if curr_a[0] == curr_b[0]:
+            # Match: no cost
+            queue.append((
+                curr_a[1:], 
+                curr_b[1:], 
+                dist, 
+                path_a + [curr_a[0]], 
+                path_b + [curr_b[0]]
+            ))
+        else:
+            # Replace: different characters, add cost
+            queue.append((
+                curr_a[1:], 
+                curr_b[1:], 
+                dist + 1, 
+                path_a + [curr_a[0]], 
+                path_b + [curr_b[0]]
+            ))
+    
+    # If no path found (unlikely)
+    return float('inf'), ([], [])
+
+def ed_bfs_wrapper(a, b):
+    """
+    Wrapper function to return edit distance and alignment
+    
+    Args:
+    a (str): First input string
+    b (str): Second input string
+    
+    Returns:
+    tuple: (edit distance, (aligned_a, aligned_b))
+    """
+    return ed_bfs(a, b)
 
 # def longestSubstringFinder(string1, string2):
 #     answer = ""
@@ -513,41 +727,81 @@ def cutoff(a, b, bound,
         return False
 
 
-def ed_bb(a, b, cumulcost=0, path=[], bound=None):
-    # Initialize bound with infinity if not provided
-    if bound is None:
-        bound = [float('inf')]
+# def ed_bb(a, b, cumulcost=0, path=[], bound=None):
+#      # Initialize bound with infinity if not provided
+#     if bound is None:
+#         bound = [float('inf')]
 
-    # Base cases
+#     # Base cases
+#     if a == "":
+#         total_cost = cumulcost + len(b)
+#         if total_cost < bound[0]:
+#             bound[0] = total_cost
+#         return (len(b), path + ['m'] * len(b))
+
+#     if b == "":
+#         total_cost = cumulcost + len(a)
+#         if total_cost < bound[0]:
+#             bound[0] = total_cost
+#         return (len(a), path + ['g'] * len(a))
+
+#     # Determine cost of substitution/match
+#     cost = 0 if a[-1] == b[-1] else 1
+
+#     # Cutoff condition to prune branches
+#     if cumulcost + min(len(a), len(b)) >= bound[0]:
+#         return (float('inf'), path)
+
+#     # Recursive exploration of branches
+#     gauche = ed_bb(a[:-1], b, cumulcost + 1, path + ['g'], bound)
+#     milieu = ed_bb(a, b[:-1], cumulcost + 1, path + ['m'], bound)
+#     droite = ed_bb(a[:-1], b[:-1], cumulcost + cost, path + ['d'], bound)
+
+#     # Take the minimum cost branch
+#     res = min([gauche, milieu, droite], key=lambda x: x[0])
+#     return res
+  # This permits to return an (int,path) in every case, otherwise, the function cannot works. Moreother if we reach this step it means that cutoff occured, so first we don't make recursive call, and second we return a very big number that cannot be the min of the compared paths
+
+def ed_bb(a, b, cumulcost=0, path=[], bound=None):
+
+    if bound is None:
+        bound = []
+        bound.append(
+            987654321)  # As the bound can't be used as a local int variable in this algorithm, I used this trick (to avoid to define a global variable)
+
     if a == "":
-        total_cost = cumulcost + len(b)
-        if total_cost < bound[0]:
-            bound[0] = total_cost
+        if cumulcost + len(b) < bound[0]:
+            bound[0] = cumulcost + len(
+                b)  # When reaching a solution, we check if the cost is lesser than current bound, and if so we update the bound
         return (len(b), path + ['m'] * len(b))
 
     if b == "":
-        total_cost = cumulcost + len(a)
-        if total_cost < bound[0]:
-            bound[0] = total_cost
+        if cumulcost + len(a) < bound[0]:
+            bound[0] = cumulcost + len(a)
         return (len(a), path + ['g'] * len(a))
 
-    # Determine cost of substitution/match
-    cost = 0 if a[-1] == b[-1] else 1
+    if a[-1] == b[-1]:
+        cost = 0
+    else:
+        cost = 1
 
-    # Cutoff condition to prune branches
-    if cumulcost + min(len(a), len(b)) >= bound[0]:
-        return (float('inf'), path)
+    if cutoff(a, b, bound[0], cumulcost) == False:
+        gauche = ed_bb(a[:-1], b, cumulcost + 1, path + ['g'],
+                       bound)  # The steps here are classical as in the recursive way
+        gauche = (gauche[0] + 1, gauche[1])
 
-    # Recursive exploration of branches
-    gauche = ed_bb(a[:-1], b, cumulcost + 1, path + ['g'], bound)
-    milieu = ed_bb(a, b[:-1], cumulcost + 1, path + ['m'], bound)
-    droite = ed_bb(a[:-1], b[:-1], cumulcost + cost, path + ['d'], bound)
+        milieu = ed_bb(a, b[:-1], cumulcost + 1, path + ['m'], bound)
+        milieu = (milieu[0] + 1, milieu[1])
 
-    # Take the minimum cost branch
-    res = min([gauche, milieu, droite], key=lambda x: x[0])
-    return res
-  # This permits to return an (int,path) in every case, otherwise, the function cannot works. Moreother if we reach this step it means that cutoff occured, so first we don't make recursive call, and second we return a very big number that cannot be the min of the compared paths
+        droite = ed_bb(a[:-1], b[:-1], cumulcost + cost, path + ['d'], bound)
+        droite = (droite[0] + cost, droite[1])
 
+        res = min([gauche, milieu, droite], key=lambda x: x[0])
+
+        return res
+
+    else:
+        return (123456789, path)
 
 def ed_bb_with_path_and_alignment(a, b):
     return ed_bb(a, b), alignment_bb(a, b)
@@ -598,11 +852,11 @@ def rec_alignment(a, b):
     BB = []  # Simply will containt characters of string b
     i = 0
     while i < len(a):
-        AA.append(a[i]);
+        AA.append(a[i])
         i += 1
     i = 0
     while i < len(b):
-        BB.append(b[i]);
+        BB.append(b[i])
         i += 1
 
     path = ed_recursive(a, b)[1]
@@ -613,12 +867,12 @@ def rec_alignment(a, b):
         if path[i] == 'g':
             B.append('*')
         else:
-            B.append(BB[0]);
+            B.append(BB[0])
             del BB[0]
         if path[i] == 'm':
             A.append('*')
         else:
-            A.append(AA[0]);
+            A.append(AA[0])
             del AA[0]
     return (A, B)
 
@@ -627,27 +881,57 @@ def rec_ed_with_path_and_alignment(a, b):
     return (ed_recursive(a, b), rec_alignment(a, b))
 
 
+# def alignment_bb(a, b):
+#     A, B = [], []
+#     AA, BB = list(a), list(b)  # Convert strings to lists for mutable operations
+
+#     # Retrieve the path from the Branch and Bound algorithm
+#     path = ed_bb(a, b)[1][::-1]  # Reverse the path for correct indexing
+
+#     # Construct aligned strings
+#     for step in path:
+#         if step == 'g':
+#             B.append('*')
+#         else:
+#             B.append(BB.pop(0) if BB else '*')
+
+#         if step == 'm':
+#             A.append('*')
+#         else:
+#             A.append(AA.pop(0) if AA else '*')
+
+#     return (A, B)
+
 def alignment_bb(a, b):
-    A, B = [], []
-    AA, BB = list(a), list(b)  # Convert strings to lists for mutable operations
+    A = []
+    B = []
+    AA = []  # Simply will containt characters of string a
+    BB = []  # Simply will containt characters of string b
+    i = 0
+    while i < len(a):
+        AA.append(a[i])
+        i += 1
+    i = 0
+    while i < len(b):
+        BB.append(b[i])
+        i += 1
 
-    # Retrieve the path from the Branch and Bound algorithm
-    path = ed_bb(a, b)[1][::-1]  # Reverse the path for correct indexing
+    path = ed_bb(a, b)[1]
+    path.reverse()  # We reverse path because it is more conveniant for indexation
 
-    # Construct aligned strings
-    for step in path:
-        if step == 'g':
+    for i in range(len(path)):
+
+        if path[i] == 'g':
             B.append('*')
         else:
-            B.append(BB.pop(0) if BB else '*')
-
-        if step == 'm':
+            B.append(BB[0])
+            del BB[0]
+        if path[i] == 'm':
             A.append('*')
         else:
-            A.append(AA.pop(0) if AA else '*')
-
+            A.append(AA[0])
+            del AA[0]
     return (A, B)
-
 
 
 #ffff

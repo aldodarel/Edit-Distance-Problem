@@ -298,3 +298,57 @@ $("#calcdivideandconquerV2Reset").click(function(event){
   //this will redirect us in same window
    window.location = url2;
 });
+
+//fdf
+$("#calcbacktracking").click(function(event){
+  event.preventDefault();
+//this will find the selected website from the dropdown
+var str_A = $("#str_A").val();
+var str_B = $("#str_B").val();
+
+if(str_A == '' || str_B == ''){
+  $("#errormsgdynamic").show();
+ // alert("ffff");
+  return false;
+}
+  var url1 = "/backtracking/"+str_A+"/"+str_B;
+  //console.log(url1);
+//this will redirect us in same window
+ window.location = url1;
+});
+
+$("#calcbacktrackingReset").click(function(event){
+  event.preventDefault();
+//this will find the selected website from the dropdown
+  var url2 = "/backtracking";
+  //console.log(url1);
+//this will redirect us in same window
+ window.location = url2;
+});
+
+//fdf
+$("#calcbfs").click(function(event){
+  event.preventDefault();
+//this will find the selected website from the dropdown
+var str_A = $("#str_A").val();
+var str_B = $("#str_B").val();
+
+if(str_A == '' || str_B == ''){
+  $("#errormsgdynamic").show();
+ // alert("ffff");
+  return false;
+}
+  var url1 = "/bfs/"+str_A+"/"+str_B;
+  //console.log(url1);
+//this will redirect us in same window
+ window.location = url1;
+});
+
+$("#calcbfsReset").click(function(event){
+  event.preventDefault();
+//this will find the selected website from the dropdown
+  var url2 = "/bfs";
+  //console.log(url1);
+//this will redirect us in same window
+ window.location = url2;
+});
